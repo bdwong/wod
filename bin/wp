@@ -1,0 +1,26 @@
+#!/bin/bash -e
+
+container=`docker container ls -q -f name="$(basename $(pwd)|tr -d '-')_wordpress"`
+
+# --user 33:33 is a workaround to run cli with the same UID/GID
+# as www-data in the WordPress container. Problems arise because the
+# containers have different UID/GID for www-data.
+# See https://github.com/docker-library/wordpress/issues/256
+#
+# This trick should work in docker-compose.yml as well. Add  `user: "33:33"`.
+# See https://github.com/docker/compose/issues/1532
+#
+
+# Use correct arguments depending on whether input is a tty or a pipe.
+# https://stackoverflow.com/questions/911168/how-to-detect-if-my-shell-script-is-running-through-a-pipe
+if [ -t 0 ] ; then
+    inputargs=-it
+else
+    inputargs=-i
+fi
+docker run $inputargs --rm \
+    --volumes-from $container \
+    --network container:$container \
+    --user 33:33 \
+    wordpress:cli "$@"
+

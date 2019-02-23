@@ -1,0 +1,55 @@
+#!/bin/bash -e
+
+function usage () {
+    util="wp-restore" #`basename $0`
+    echo "${util}: Restore a WordPress backup from the command line."
+    echo "Usage:"
+    echo "${util} <backup-directory>"
+    echo
+    echo "Where <backup-directory> contains the following files:"
+    echo "  backup*-plugins.zip"
+    echo "  backup*-themes.zip"
+    echo "  backup*-uploads.zip"
+    echo "  backup*-others.zip"
+    echo "  backup*-db.gz"
+    echo
+}
+
+if [[ -z $1 ]]; then
+    usage
+    exit 1
+fi
+
+backupdir=$1
+if [[ ! -d $backupdir ]]; then
+    echo "\"$backupdir\" is not a directory."
+    usage
+    exit 1
+fi
+
+for content_type in plugins themes uploads others; do
+    zipfile=${backupdir}/backup*-${content_type}.zip
+    # Use single bracket 'test' for correct substitution order.
+    # Note an array will also work; see https://stackoverflow.com/questions/17510339/how-can-i-force-bash-to-expand-a-variable-to-pass-it-as-an-argument
+    if [ ! -f $zipfile ]; then
+        echo "Warning: ${content_type} file not found."
+        continue
+    fi
+    if [[ -d site/wp-content/$content_type ]]; then
+        sudo rm -rf site/wp-content/$content_type
+    fi
+   sudo unzip -od site/wp-content $zipfile
+done
+
+# Fix file permissions
+sudo chown -R www-data:www-data site/wp-content
+
+# Restore the database last.
+zipfile=${backupdir}/backup*-db.gz
+if [[ -z $zipfile ]]; then
+    echo "Warning: database file not found."
+else
+    zcat $zipfile \
+        | sed -e '/^# -----/ a\' -e "/*\!40101 SET sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */;" \
+        | ./wp db import -
+fi

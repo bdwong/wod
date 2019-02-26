@@ -82,7 +82,7 @@ if [ -e ${TARGET_NAME} ]; then
     exit 1
 fi
 # Ensure backup directory exists.
-if [ -n "${BACKUP_PREFIX}" ! -d "${BACKUP_PREFIX}" ]; then
+if [ -n "${BACKUP_PREFIX}" ] && [ ! -d "${BACKUP_PREFIX}" ]; then
     echo "Not a directory: ${BACKUP_PREFIX}."
     exit 1
 fi

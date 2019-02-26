@@ -98,7 +98,10 @@ sed -i -e "s/^FROM.*$/FROM wordpress:${WORDPRESS_TAG}/" \
     ${TARGET_NAME}/wp-php-custom/Dockerfile
 # TODO: verify the wordpress tag is valid
 
-sed -i -e "s/^\([[:space:]]*\)image: mysql.*$/\1image: mysql:${MYSQL_VERSION}/" \
+wp_image_tag=wordpress:${WORDPRESS_VERSION}-php${PHP_VERSION}-custom
+sed -i \
+    -e "s/^\([[:space:]]*\)image: mysql.*$/\1image: mysql:${MYSQL_VERSION}/" \
+    -e "s/^\([[:space:]]*\)image: wordpress.*$/\1image: ${wp_image_tag}/" \
     ${TARGET_NAME}/docker-compose.yml
 # TODO: verify the mysql tag is valid
 

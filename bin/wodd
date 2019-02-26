@@ -53,7 +53,7 @@ check_container() {
 container_id=`docker container ls -qf "name=${TARGET_NAME}_$1_"`
 if [ -n "${container_id}" ]; then
         echo "ERROR: Container ${TARGET_NAME}_$1_* already exists."
-        echo "Run 'cd ${TARGET_NAME}; docker-compose down -v'."
+        echo "Run 'docker-compose -f ${TARGET_NAME}/docker-compose.yml down -v'."
         echo "If that doesn't work, try 'docker stop ${container_id}'."
         exit 1
 fi

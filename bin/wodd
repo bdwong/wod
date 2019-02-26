@@ -4,17 +4,16 @@
 # Create a new wordpress docker image in the working directory.
 # Usage:
 #
-# wodd [container-name [backup-prefix]] -
+# wodd container-name [backup-directory]
 
 # Set defaults
-TEMPLATE_DIR=/usr/lib/wodd/template
-TEMPLATE_NAME=default
-TARGET_NAME=container
-WORDPRESS_VERSION=5.0.3
-PHP_VERSION=7.1
+TEMPLATE_DIR=${TEMPLATE_DIR:-/usr/lib/wodd/template}
+TEMPLATE_NAME=${TEMPLATE_NAME:-default}
+WORDPRESS_VERSION=${WORDPRESS_VERSION:-5.0.3}
+PHP_VERSION=${PHP_VERSION:-7.1}
 # NOTE: mcrypt does not exist in PHP 7.3; use 7.1 if you need it.
-MYSQL_VERSION=5.7
-SITEURL="http://127.0.0.1:8000"
+MYSQL_VERSION=${MYSQL_VERSION:-5.7}
+SITEURL=${SITEURL:-"http://127.0.0.1:8000"}
 
 # Example overrides.
 # WORDPRESS_VERSION=4.9.6
@@ -32,33 +31,44 @@ fi
 TARGET_NAME=${1:-$TARGET_NAME}
 BACKUP_PREFIX=${2:-$BACKUP_PREFIX}
 
+if [ -z "$TARGET_NAME" ]; then
+    cat <<-EOF
+wodd: WordPress on Disposable Docker container.
+
+Create a new wordpress docker image in the working directory.
+Usage:  wodd [container-name [backup-directory]]
+
+EOF
+    exit 1
+fi
+
 # Compute wordpress tag name
 WORDPRESS_TAG=${WORDPRESS_TAG:-${WORDPRESS_VERSION}-php${PHP_VERSION}-apache}
 
 # Prerequisites
 
-# Ensure the target name is not running
-# TODO: Do this for the db too.
-container_id=`docker container ls -qf "name=${TARGET_NAME}_wordpress_"`
+# $1 = name of container, "wordpress" or "db"
+check_container() {
+# Ensure container is not running
+container_id=`docker container ls -qf "name=${TARGET_NAME}_$1_"`
 if [ -n "${container_id}" ]; then
-        echo "ERROR: Container ${TARGET_NAME}_wordpress_* already exists."
+        echo "ERROR: Container ${TARGET_NAME}_$1_* already exists."
         echo "Run 'cd ${TARGET_NAME}; docker-compose down -v'."
         echo "If that doesn't work, try 'docker stop ${container_id}'."
         exit 1
 fi
-# Ensure containers don't exist.
-container_id=`docker container ls -aqf "name=${TARGET_NAME}_wordpress_"`
+# Ensure container doesn't exist.
+container_id=`docker container ls -aqf "name=${TARGET_NAME}_$1_"`
 if [ -n "${container_id}" ]; then
-        echo "ERROR: Container ${TARGET_NAME}_wordpress_* already exists."
+        echo "ERROR: Container ${TARGET_NAME}_$1_* already exists."
         echo "Delete the container with 'docker rm -v ${container_id}'."
         exit 1
 fi
-container_id=`docker container ls -qf "name=${TARGET_NAME}_db_"`
-if [ -n "${container_id}" ]; then
-        echo "ERROR: Container ${TARGET_NAME}_db_* already exists."
-        echo "Delete the container with 'docker rm -v ${container_id}'."
-        exit 1
-fi
+}
+
+check_container wordpress
+check_container db
+
 # Ensure db volume was deleted.
 volume_name=`docker volume ls -qf "name=${TARGET_NAME}_db_data"`
 if [ -n "${volume_name}" ]; then
@@ -72,7 +82,7 @@ if [ -e ${TARGET_NAME} ]; then
     exit 1
 fi
 # Ensure backup directory exists.
-if ! [ -d "${BACKUP_PREFIX}" ]; then
+if [ -n "${BACKUP_PREFIX}" ! -d "${BACKUP_PREFIX}" ]; then
     echo "Not a directory: ${BACKUP_PREFIX}."
     exit 1
 fi

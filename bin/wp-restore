@@ -28,17 +28,26 @@ if [[ ! -d $backupdir ]]; then
 fi
 
 for content_type in plugins themes uploads others; do
-    zipfile=${backupdir}/backup*-${content_type}.zip
-    # Use single bracket 'test' for correct substitution order.
-    # Note an array will also work; see https://stackoverflow.com/questions/17510339/how-can-i-force-bash-to-expand-a-variable-to-pass-it-as-an-argument
-    if [ ! -f $zipfile ]; then
+    if [ "${backupdir}/backup*-${content_type}.zip" == "" ]; then
         echo "Warning: ${content_type} file not found."
         continue
     fi
+
     if [[ -d site/wp-content/$content_type ]]; then
         sudo rm -rf site/wp-content/$content_type
     fi
-   sudo unzip -od site/wp-content $zipfile
+
+    # The content may be broken up into multiple zip files.
+    for zipfile in ${backupdir}/backup*-${content_type}*.zip; do
+        # Use single bracket 'test' for correct substitution order.
+        # Note an array will also work; see https://stackoverflow.com/questions/17510339/how-can-i-force-bash-to-expand-a-variable-to-pass-it-as-an-argument
+        if [ ! -f $zipfile ]; then
+            echo "Warning: ${zipfile} is not a valid archive."
+            continue
+        fi
+        sudo unzip -od site/wp-content $zipfile
+    done
+
 done
 
 # Fix file permissions
@@ -51,5 +60,5 @@ if [[ -z $zipfile ]]; then
 else
     zcat $zipfile \
         | sed -e '/^# -----/ a\' -e "/*\!40101 SET sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */;" \
-        | ./wp db import -
+        | wp db import -
 fi

@@ -24,5 +24,5 @@ templates : $(SRCDIR_TEMPLATES)
 
 .PHONY : uninstall
 uninstall :
-	rm $(BINDIR_SCRIPTS)
+	rm -f $(BINDIR_SCRIPTS)
 	rm -rf $(LIBDIR)

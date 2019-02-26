@@ -1,8 +1,7 @@
 # TODO
 
-- Make wodd read environment variables from $HOME/.config/wodd/wodd.conf
-- Make wodd copy from the template directory. (hard-code for /usr/lib/wodd/template but override allowed)
+- verify the WordPress image tag is valid
+- verify the MySQL image tag is valid
 
-- Create `make install`
-- Create `make uninstall`
-- read configuration file in user's home directory
+- refuse to run wodd if the container_db volume is already present.
+    - Provide information on how to delete it.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # wodd: WordPress on Disposable Docker container.
 #
 # Create a new wordpress docker image in the working directory.
@@ -7,8 +7,21 @@
 # wodd [container-name [backup-prefix]] -
 
 # Set defaults
-TEMPLATE_DIR=/usr/lib/wodd/template/default
+TEMPLATE_DIR=/usr/lib/wodd/template
+TEMPLATE_NAME=default
 TARGET_NAME=container
+WORDPRESS_VERSION=5.0.3
+PHP_VERSION=7.1
+# NOTE: mcrypt does not exist in PHP 7.3; use 7.1 if you need it.
+MYSQL_VERSION=5.7
+SITEURL="http://127.0.0.1:8000"
+
+# Example overrides.
+# WORDPRESS_VERSION=4.9.6
+# PHP_VERSION=7.1
+
+# WORDPRESS_TAG=latest
+# MYSQL_VERSION=5.7
 
 # Override defaults with user configuration
 if [ -f $HOME/.config/wodd/wodd.conf ]; then
@@ -16,13 +29,87 @@ if [ -f $HOME/.config/wodd/wodd.conf ]; then
 fi
 
 # Override configuration with command line arguments.
-TARGET_NAME=${1:=$TARGET_NAME}
-BACKUP_PREFIX=${2:=$BACKUP_PREFIX}
+TARGET_NAME=${1:-$TARGET_NAME}
+BACKUP_PREFIX=${2:-$BACKUP_PREFIX}
 
-# Copy tempate to DOCKER_COMPOSE_DIR
+# Compute wordpress tag name
+WORDPRESS_TAG=${WORDPRESS_TAG:-${WORDPRESS_VERSION}-php${PHP_VERSION}-apache}
 
+# Prerequisites
+
+# Ensure the target name is not running
+# TODO: Do this for the db too.
+container_id=`docker container ls -qf "name=${TARGET_NAME}_wordpress_"`
+if [ -n "${container_id}" ]; then
+        echo "ERROR: Container ${TARGET_NAME}_wordpress_* already exists."
+        echo "Run 'cd ${TARGET_NAME}; docker-compose down -v'."
+        echo "If that doesn't work, try 'docker stop ${container_id}'."
+        exit 1
+fi
+# Ensure containers don't exist.
+container_id=`docker container ls -aqf "name=${TARGET_NAME}_wordpress_"`
+if [ -n "${container_id}" ]; then
+        echo "ERROR: Container ${TARGET_NAME}_wordpress_* already exists."
+        echo "Delete the container with 'docker rm -v ${container_id}'."
+        exit 1
+fi
+container_id=`docker container ls -qf "name=${TARGET_NAME}_db_"`
+if [ -n "${container_id}" ]; then
+        echo "ERROR: Container ${TARGET_NAME}_db_* already exists."
+        echo "Delete the container with 'docker rm -v ${container_id}'."
+        exit 1
+fi
+# Ensure db volume was deleted.
+volume_name=`docker volume ls -qf "name=${TARGET_NAME}_db_data"`
+if [ -n "${volume_name}" ]; then
+        echo "ERROR: Volume ${volume_name} already exists."
+        echo "Delete the volume with 'docker volume rm ${volume_name}'."
+        exit 1
+fi
+# Ensure target name doesn't exist
+if [ -e ${TARGET_NAME} ]; then
+    echo "${TARGET_NAME} already exists."
+    exit 1
+fi
+# Ensure backup directory exists.
+if ! [ -d "${BACKUP_PREFIX}" ]; then
+    echo "Not a directory: ${BACKUP_PREFIX}."
+    exit 1
+fi
+
+
+# Copy template to DOCKER_COMPOSE_DIR
+echo "Creating container directory for '${TARGET_NAME}'"
 mkdir -p ${TARGET_NAME}
-cp -r ${TEMPLATE_DIR}/* ${TARGET_NAME}/
+cp -r ${TEMPLATE_DIR}/${TEMPLATE_NAME}/* ${TARGET_NAME}/
 
-# TODO: Modify the tempate for the wordpress version, php version, mysql version.
+# Modify the tempate for the wordpress version, php version, mysql version.
+sed -i -e "s/^FROM.*$/FROM wordpress:${WORDPRESS_TAG}/" \
+    ${TARGET_NAME}/wp-php-custom/Dockerfile
+# TODO: verify the wordpress tag is valid
 
+sed -i -e "s/^\([[:space:]]*\)image: mysql.*$/\1image: mysql:${MYSQL_VERSION}/" \
+    ${TARGET_NAME}/docker-compose.yml
+# TODO: verify the mysql tag is valid
+
+echo "Ready to run docker-compose up. Press Enter to continue"
+read
+
+cd ${TARGET_NAME}
+docker-compose up -d
+# The database needs a little time to come up.
+sleep 10
+
+# Install WordPress core. Autogenerate password.
+wp core install --url=${SITEURL} --title="Testing WordPress" --admin_user="admin" --admin_email="admin@127.0.0.1"
+
+if [ "${BACKUP_PREFIX}" != "" ]; then
+    echo "Restore from backup."
+    wp-restore ${BACKUP_PREFIX}
+
+    # Change the site url:
+    wp option set siteurl ${SITEURL}
+    wp option set home ${SITEURL}
+fi
+
+echo "Website ready at ${SITEURL}"

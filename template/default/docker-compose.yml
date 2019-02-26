@@ -15,8 +15,8 @@ services:
    wordpress:
       depends_on:
          - db
-      build: ./wp-php-with-extensions
-      image: wordpress:4.9.6-php7.1-iconv-mcrypt-gd-apache
+      build: ./wp-php-custom
+      image: wordpress:4.9.6-php7.1-custom
       volumes:
          # - wordpress_data:/var/www/html
          - ./site:/var/www/html

@@ -1,13 +1,13 @@
 #!/bin/bash -e
-# wodd: WordPress on Disposable Docker container.
+# wod: WordPress on disposable Docker container.
 #
 # Create a new wordpress docker image in the working directory.
 # Usage:
 #
-# wodd container-name [backup-directory]
+# wod container-name [backup-directory]
 
 # Set defaults
-TEMPLATE_DIR=${TEMPLATE_DIR:-/usr/lib/wodd/template}
+TEMPLATE_DIR=${TEMPLATE_DIR:-/usr/lib/wod/template}
 TEMPLATE_NAME=${TEMPLATE_NAME:-default}
 WORDPRESS_VERSION=${WORDPRESS_VERSION:-5.0.3}
 PHP_VERSION=${PHP_VERSION:-7.1}
@@ -23,8 +23,8 @@ SITEURL=${SITEURL:-"http://127.0.0.1:8000"}
 # MYSQL_VERSION=5.7
 
 # Override defaults with user configuration
-if [ -f $HOME/.config/wodd/wodd.conf ]; then
-    export $(grep -v '^#' $HOME/.config/wodd/wodd.conf | xargs -d '\n') &>/dev/null
+if [ -f $HOME/.config/wod/wod.conf ]; then
+    export $(grep -v '^#' $HOME/.config/wod/wod.conf | xargs -d '\n') &>/dev/null
 fi
 
 # Override configuration with command line arguments.
@@ -33,10 +33,10 @@ BACKUP_PREFIX=${2:-$BACKUP_PREFIX}
 
 if [ -z "$TARGET_NAME" ]; then
     cat <<-EOF
-wodd: WordPress on Disposable Docker container.
+wod: WordPress on Disposable Docker container.
 
 Create a new wordpress docker image in the working directory.
-Usage:  wodd [container-name [backup-directory]]
+Usage:  wod [container-name [backup-directory]]
 
 EOF
     exit 1

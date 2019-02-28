@@ -1,10 +1,10 @@
 # Environment variables
 
-SCRIPTS=wodd wp wp-restore
+SCRIPTS=wod wp wp-restore
 TEMPLATES=default
 
 BINDIR=/usr/bin
-LIBDIR=/usr/lib/wodd
+LIBDIR=/usr/lib/wod
 LIB_TEMPLATE_DIR=$(LIBDIR)/template
 SRC_TEMPLATE_DIR=./template
 SRCDIR_TEMPLATES=$(addprefix $(SRC_TEMPLATE_DIR)/,$(TEMPLATES))
@@ -12,7 +12,7 @@ SRCDIR_SCRIPTS=$(addprefix bin/,$(SCRIPTS))
 BINDIR_SCRIPTS=$(addprefix $(BINDIR)/,$(SCRIPTS))
 
 default :
-	@echo "Run make install to install wodd."
+	@echo "Run make install to install wod."
 
 install : bin templates
 

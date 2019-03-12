@@ -16,7 +16,9 @@ default :
 
 install : bin templates
 
-bin : $(SRCDIR_SCRIPTS)
+bin : $(BINDIR_SCRIPTS)
+
+$(BINDIR_SCRIPTS) : $(SRCDIR_SCRIPTS)
 	install $(SRCDIR_SCRIPTS) $(BINDIR)
 
 templates : $(SRCDIR_TEMPLATES)

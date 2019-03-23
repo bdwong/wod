@@ -1,7 +1,7 @@
 # Environment variables
 
 SCRIPTS=wod wp wp-restore
-TEMPLATES=default
+TEMPLATES=default no-mcrypt
 
 BINDIR=/usr/bin
 LIBDIR=/usr/lib/wod

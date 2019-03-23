@@ -55,7 +55,11 @@ sudo chown -R www-data:www-data site/wp-content
 
 # Restore the database last.
 zipfile=${backupdir}/backup*-db.gz
-if [[ -z $zipfile ]]; then
+# Fall back to a sql filename.
+if ! [[ -f $zipfile ]]; then
+    zipfile=${backupdir}/*.sql.gz
+fi
+if [[ -f $zipfile ]]; then
     echo "Warning: database file not found."
 else
     zcat $zipfile \

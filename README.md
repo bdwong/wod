@@ -24,6 +24,23 @@ unzip the archive, then:
 sudo make install
 ```
 
+This will install the following scripts into /usr/bin:
+
+- `wod` - WordPress on Docker script
+- `wp` - script to run Docker image of wp-cli
+- `wp-restore` - script to restore a WordPress backup
+
+`wp` and `wp-restore` should be run in the directory created by `wod`.
+
+# Example usage
+
+```sh
+# Create a new WordPress instance called "staging-b"
+wod staging-b
+
+# Restore backups of mysite into staging-b
+wp-restore ~/backups/mysite
+```
 
 # Setting up a Development Environment
 

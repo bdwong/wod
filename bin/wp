@@ -1,6 +1,19 @@
 #!/bin/bash -e
 
-container=`docker container ls -q -f name="$(basename $(pwd)|tr -d '-')_wordpress"`
+container_name="$(basename $PWD)_wordpress"
+container=`docker container ls -q -f name="$container_name"`
+if [ -z "$container" ]; then
+    # Older versions of docker strip hyphens (between 2019-02 and 2021-02)
+    container_name2="$(echo $container_name|tr -d '-')"
+    container=`docker container ls -q -f name="$container_name2"`
+fi
+if [ -z "$container" ]; then
+    echo "Error: Could not find container name '${container_name}'"
+    if [ "$container_name" != "$container_name2" ]; then
+        echo " or '${container_name2}'."
+    fi
+    exit 1
+fi
 
 # --user 33:33 is a workaround to run cli with the same UID/GID
 # as www-data in the WordPress container. Problems arise because the

@@ -35,5 +35,5 @@ docker run $inputargs --rm \
     --volumes-from $container \
     --network container:$container \
     --user 33:33 \
-    wordpress:cli "$@"
+    wordpress:cli wp "$@"
 

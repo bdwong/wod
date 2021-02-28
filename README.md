@@ -147,6 +147,16 @@ sudo rm -rf site
 docker volume rm `basename $(pwd)|tr -d '-'`_db_data
 ```
 
+# Developing WOD
+
+To ease development, you can override the location WOD looks for its commands.
+You will still need to install the main WOD script.
+
+```bash
+# Look for sub-commands in ~/src/wod/lib
+export SCRIPT_HOME=~/src/wod/lib
+```
+
 # Notes and References
 
 - <https://dba.stackexchange.com/questions/6171/invalid-default-value-for-datetime-when-changing-to-utf8-general-ci>

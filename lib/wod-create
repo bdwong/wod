@@ -5,7 +5,7 @@
 #
 #   wod create <name> [backup-directory]
 
-export SCRIPT_HOME=${SCRIPT_HOME:/usr/lib/wod/bin}
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
 . $SCRIPT_HOME/functions
 wod_init
 

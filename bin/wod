@@ -14,7 +14,7 @@
 #
 # Try "wod help [command]" to get help on a command.
 
-export SCRIPT_HOME=${SCRIPT_HOME:/usr/lib/wod/bin}
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
 . $SCRIPT_HOME/functions
 wod_init
 

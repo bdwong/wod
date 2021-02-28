@@ -1,31 +1,37 @@
 #!/bin/bash -e
+# wod-restore: Restore a WordPress backup from the command line.
+#
+# Usage:
+#
+#   wod restore <target-name> <backup-directory>
+#
+# Where <backup-directory> contains the following files:
+#   backup*-plugins.zip
+#   backup*-themes.zip
+#   backup*-uploads.zip
+#   backup*-others.zip
+#   backup*-db.gz
 
-function usage () {
-    util="wp-restore" #`basename $0`
-    echo "${util}: Restore a WordPress backup from the command line."
-    echo "Usage:"
-    echo "${util} <backup-directory>"
-    echo
-    echo "Where <backup-directory> contains the following files:"
-    echo "  backup*-plugins.zip"
-    echo "  backup*-themes.zip"
-    echo "  backup*-uploads.zip"
-    echo "  backup*-others.zip"
-    echo "  backup*-db.gz"
-    echo
-}
+export SCRIPT_HOME=${SCRIPT_HOME:/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
 
-if [[ -z $1 ]]; then
-    usage
-    exit 1
+if [ -z "$2" ]; then
+	print_help $0
+	exit 1
 fi
 
-backupdir=$1
+TARGET_NAME="$1"
+ensure_target "$TARGET_NAME"
+backupdir="$2"
+
 if [[ ! -d $backupdir ]]; then
     echo "\"$backupdir\" is not a directory."
-    usage
+    print_help $0
     exit 1
 fi
+
+pushd `target_dir "$TARGET_NAME"` >/dev/null
 
 for content_type in plugins themes uploads others; do
     if [ "${backupdir}/backup*-${content_type}.zip" == "" ]; then
@@ -84,3 +90,5 @@ else
         | sed -e '/^# -----/ a\' -e "/*\!40101 SET sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */;" \
         | wp db import -
 fi
+
+popd >/dev/null

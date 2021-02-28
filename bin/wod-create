@@ -1,10 +1,18 @@
 #!/bin/bash -e
-# wod: WordPress on disposable Docker container.
+# wod-create: Create a new wordpress docker image in the working directory.
 #
-# Create a new wordpress docker image in the working directory.
 # Usage:
 #
-# wod container-name [backup-directory]
+#   wod create <name> [backup-directory]
+
+export SCRIPT_HOME=${SCRIPT_HOME:/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ -z "$1" ]; then
+	print_help $0
+	exit
+fi
 
 # Set defaults
 TEMPLATE_DIR=${TEMPLATE_DIR:-/usr/lib/wod/template}
@@ -28,24 +36,20 @@ if [ -f $HOME/.config/wod/wod.conf ]; then
 fi
 
 # Override configuration with command line arguments.
-TARGET_NAME=${1:-$TARGET_NAME}
+TARGET_NAME="$1"
+TARGET_DIR=`target_dir '$TARGET_NAME'`
 BACKUP_PREFIX=${2:-$BACKUP_PREFIX}
-
-if [ -z "$TARGET_NAME" ]; then
-    cat <<-EOF
-wod: WordPress on Disposable Docker container.
-
-Create a new wordpress docker image in the working directory.
-Usage:  wod [container-name [backup-directory]]
-
-EOF
-    exit 1
-fi
 
 # Compute wordpress tag name
 WORDPRESS_TAG=${WORDPRESS_TAG:-${WORDPRESS_VERSION}-php${PHP_VERSION}-apache}
 
 # Prerequisites
+
+# Ensure target name doesn't exist
+if [ -e ${TARGET_DIR} ]; then
+    echo "${TARGET_NAME} already exists."
+    exit 1
+fi
 
 # $1 = name of container, "wordpress" or "db"
 check_container() {
@@ -76,11 +80,6 @@ if [ -n "${volume_name}" ]; then
         echo "Delete the volume with 'docker volume rm ${volume_name}'."
         exit 1
 fi
-# Ensure target name doesn't exist
-if [ -e ${TARGET_NAME} ]; then
-    echo "${TARGET_NAME} already exists."
-    exit 1
-fi
 # Ensure backup directory exists.
 if [ -n "${BACKUP_PREFIX}" ] && [ ! -d "${BACKUP_PREFIX}" ]; then
     echo "Not a directory: ${BACKUP_PREFIX}."
@@ -90,25 +89,25 @@ fi
 
 # Copy template to DOCKER_COMPOSE_DIR
 echo "Creating container directory for '${TARGET_NAME}'"
-mkdir -p ${TARGET_NAME}
-cp -r ${TEMPLATE_DIR}/${TEMPLATE_NAME}/* ${TARGET_NAME}/
+mkdir -p ${TARGET_DIR}
+cp -r ${TEMPLATE_DIR}/${TEMPLATE_NAME}/* ${TARGET_DIR}/
 
 # Modify the tempate for the wordpress version, php version, mysql version.
 sed -i -e "s/^FROM.*$/FROM wordpress:${WORDPRESS_TAG}/" \
-    ${TARGET_NAME}/wp-php-custom/Dockerfile
+    ${TARGET_DIR}/wp-php-custom/Dockerfile
 # TODO: verify the wordpress tag is valid
 
 wp_image_tag=wordpress:${WORDPRESS_VERSION}-php${PHP_VERSION}-custom
 sed -i \
     -e "s/^\([[:space:]]*\)image: mysql.*$/\1image: mysql:${MYSQL_VERSION}/" \
     -e "s/^\([[:space:]]*\)image: wordpress.*$/\1image: ${wp_image_tag}/" \
-    ${TARGET_NAME}/docker-compose.yml
+    ${TARGET_DIR}/docker-compose.yml
 # TODO: verify the mysql tag is valid
 
 echo "Ready to run docker-compose up. Press Enter to continue"
 read
 
-cd ${TARGET_NAME}
+pushd ${TARGET_DIR} >/dev/null
 docker-compose up -d
 # The database needs a little time to come up.
 sleep 10
@@ -118,7 +117,7 @@ wp core install --url=${SITEURL} --title="Testing WordPress" --admin_user="admin
 
 if [ "${BACKUP_PREFIX}" != "" ]; then
     echo "Restore from backup."
-    wod-restore ${BACKUP_PREFIX}
+    ${SCRIPT_HOME}/wod-restore $TARGET_NAME ${BACKUP_PREFIX}
 
     # Change the site url:
     wp option set siteurl ${SITEURL}
@@ -126,3 +125,4 @@ if [ "${BACKUP_PREFIX}" != "" ]; then
 fi
 
 echo "Website ready at ${SITEURL}"
+popd >/dev/null

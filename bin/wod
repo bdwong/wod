@@ -27,7 +27,7 @@ command=$1
 shift
 
 if [ -e $SCRIPT_HOME/wod-${command} ]; then
-	$SCRIPT_HOME/wod-${command} $*
+	$SCRIPT_HOME/wod-${command} "$@"
 else
 	echo "Invalid command '${command}'."
 	print_help $0

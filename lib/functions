@@ -26,7 +26,8 @@ function target_dir () {
 function ensure_target () {
     TARGETDIR=`target_dir $1`
     if [ ! -d $TARGETDIR ]; then
-        echo "Target '${TARGETDIR}' does not exist."
+        echo "Target '$1' does not exist."
+        echo "Run 'wod ls' to see list of targets."
         exit 1
     fi
 }

@@ -1,0 +1,29 @@
+#!/bin/bash -e
+# wod-rm: Delete wordpress docker image and accompanying database.
+#
+# Usage:
+#
+#   wod rm <name>
+
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ -z "$1" ] || [ -n "$2" ]; then
+	print_help $0
+	exit
+fi
+
+target="$1"
+ensure_target $1
+
+echo "Removing $target"
+
+${SCRIPT_HOME}/wod-down $target
+sudo rm -rf `target_dir $target`
+
+# Delete db volume
+volume_name=`docker volume ls -qf "name=${target}_db_data"`
+if [ -n "${volume_name}" ]; then
+    docker volume rm "${volume_name}"
+fi

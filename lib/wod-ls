@@ -29,18 +29,25 @@ if [ -z "${instances}" ]; then
     exit
 fi
 
-echo "dw | name"
-echo "---+-------------------------"
+docker_is_running && docker=0 || docker=$?
+
+# $1 = instance name
+# $2 = db or wordpress
+function print_container_status () {
+    if [ $docker -ne 0 ]; then
+        echo -n 'E '
+    elif container_is_running "$1" "$2"; then
+        echo -n '* '
+    else
+        echo -n '. '
+    fi
+}
+
+echo "d w |"
+echo "b p | name"
+echo "====#========================="
 for instance in ${instances}; do
-    if container_is_running "${instance}" db; then
-        echo -n '*'
-    else
-        echo -n '.'
-    fi
-    if container_is_running "${instance}" wordpress; then
-        echo -n '*'
-    else
-        echo -n '.'
-    fi
-    echo " | $instance"
+    print_container_status "${instance}" db
+    print_container_status "${instance}" wordpress
+    echo "| $instance"
 done

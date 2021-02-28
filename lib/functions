@@ -31,6 +31,17 @@ function ensure_target () {
     fi
 }
 
+function docker_is_running () {
+    docker version >/dev/null || return $?
+}
+
+function ensure_docker () {
+    if ! docker version >/dev/null; then
+        echo "Docker daemon is not running."
+        exit 1
+    fi
+}
+
 # Return 0 if the container is running, 1 otherwise.
 # $1 = container name
 # $2 = "wordpress" or "db"

@@ -9,7 +9,7 @@ export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
 . $SCRIPT_HOME/functions
 wod_init
 
-if [ -z "$1" ]; then
+if [ -z "$1" ] || [ -n "$3" ]; then
 	print_help $0
 	exit
 fi

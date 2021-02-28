@@ -18,7 +18,7 @@ export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
 . $SCRIPT_HOME/functions
 wod_init
 
-if [ -n "$1" ]; then
+if [ $# -ne 0 ]; then
 	print_help $0
 	exit
 fi

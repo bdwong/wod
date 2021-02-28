@@ -1,0 +1,23 @@
+#!/bin/bash -e
+# wod-up: Start up wordpress docker container and accompanying database.
+#
+# Usage:
+#
+#   wod up <name>
+
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ -z "$1" ] || [ -n "$2" ]; then
+	print_help $0
+	exit
+fi
+
+target="$1"
+ensure_target $1
+
+pushd `target_dir $target` >/dev/null
+docker-compose up -d && result=0 || result=$?
+popd >/dev/null
+exit $result

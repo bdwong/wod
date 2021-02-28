@@ -1,0 +1,46 @@
+#!/bin/bash -e
+# wod-ls: List containers created by wod.
+#
+# Usage:
+#
+#   wod ls
+#
+# The output shows in the following format:
+#
+#   dw <name>
+#
+# Where
+#   'd' - '*' if database is running, '.' if not.
+#   'w' - '*' if WordPress is running, '.' if not.
+#   <name> - name of the containers.
+
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ -n "$1" ]; then
+	print_help $0
+	exit
+fi
+
+instances=`ls ${WOD_HOME} --quoting-style=shell-escape`
+if [ -z "${instances}" ]; then
+    echo "No wod instances found."
+    exit
+fi
+
+echo "dw | name"
+echo "---+-------------------------"
+for instance in ${instances}; do
+    if container_is_running "${instance}" db; then
+        echo -n '*'
+    else
+        echo -n '.'
+    fi
+    if container_is_running "${instance}" wordpress; then
+        echo -n '*'
+    else
+        echo -n '.'
+    fi
+    echo " | $instance"
+done

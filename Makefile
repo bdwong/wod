@@ -1,7 +1,7 @@
 # Environment variables
 
 SCRIPTS=wod wp
-LIB_SCRIPTS=wod-create wod-restore
+LIB_SCRIPTS=wod-create wod-ls wod-restore
 TEMPLATES=default no-mcrypt
 
 BINDIR=/usr/bin

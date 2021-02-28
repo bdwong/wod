@@ -4,6 +4,7 @@
 # Initialize WOD global variables.
 function wod_init () {
     export WOD_HOME=${WOD_HOME:-~/wod}
+    mkdir -p ${WOD_HOME}
 }
 
 # Print the header of the calling script from line 2
@@ -35,7 +36,7 @@ function ensure_target () {
 # $2 = "wordpress" or "db"
 function container_is_running () {
     container_id=`docker container ls -qf "name=$1_$2_"`
-    return [ -n "${container_id}" ];
+    [ -n "${container_id}" ] || return $?
 }
 
 # Return 0 if the container exists in docker, 1 otherwise.
@@ -43,5 +44,5 @@ function container_is_running () {
 # $2 = "wordpress" or "db"
 function container_exists () {
     container_id=`docker container ls -aqf "name=$1_$2_"`
-    return [ -n "${container_id}" ]
+    [ -n "${container_id}" ] || return $?
 }

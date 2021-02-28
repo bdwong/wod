@@ -9,7 +9,7 @@
 - Suppress overwriting the .htaccess file, or at least back it up.
 - Use `docker pull wordpress:<tag>` to test if an image exists.
     - Try backup formats before declaring the image does not exist.
-- Determine nonstandard table prefix by examining the db files.
+- Determine default WordPress version by examining the db files.
 - Extract either of .sql.gz or db.gz for database files.
     - db.gz for Updraft plus
     - .sql.gz for Backup WP Database plugin.

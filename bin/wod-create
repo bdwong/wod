@@ -118,7 +118,7 @@ wp core install --url=${SITEURL} --title="Testing WordPress" --admin_user="admin
 
 if [ "${BACKUP_PREFIX}" != "" ]; then
     echo "Restore from backup."
-    wp-restore ${BACKUP_PREFIX}
+    wod-restore ${BACKUP_PREFIX}
 
     # Change the site url:
     wp option set siteurl ${SITEURL}

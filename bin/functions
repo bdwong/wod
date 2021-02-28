@@ -1,0 +1,47 @@
+# This file should be sourced.
+# 
+
+# Initialize WOD global variables.
+function wod_init () {
+    export WOD_HOME=${WOD_HOME:-~/wod}
+}
+
+# Print the header of the calling script from line 2
+# and strip leading hashes.
+# The header should contain help information.
+#
+function print_help () {
+    cat $0 | sed -ne '2,/^$/{s/^#\s\?//;p}'
+}
+
+# Echo the path of the container directory.
+# $1 - container name
+#
+function target_dir () {
+    echo "${WOD_HOME}/$1"
+}
+
+# Ensure the container directory exists.
+function ensure_target () {
+    TARGETDIR=`target_dir $1`
+    if [ ! -d $TARGETDIR ]; then
+        echo "Target '${TARGETDIR}' does not exist."
+        exit 1
+    fi
+}
+
+# Return 0 if the container is running, 1 otherwise.
+# $1 = container name
+# $2 = "wordpress" or "db"
+function container_is_running () {
+    container_id=`docker container ls -qf "name=$1_$2_"`
+    return [ -n "${container_id}" ];
+}
+
+# Return 0 if the container exists in docker, 1 otherwise.
+# $1 = container name
+# $2 = "wordpress" or "db"
+function container_exists () {
+    container_id=`docker container ls -aqf "name=$1_$2_"`
+    return [ -n "${container_id}" ]
+}

@@ -10,9 +10,10 @@ function wod_init () {
 # Print the header of the calling script from line 2
 # and strip leading hashes.
 # The header should contain help information.
+# $1 = path to command file, if not present, use the executing script path.
 #
 function print_help () {
-    cat $0 | sed -ne '2,/^$/{s/^#\s\?//;p}'
+    cat ${1:-$0} | sed -ne '2,/^$/{s/^#\s\?//;p}'
 }
 
 # Echo the path of the container directory.

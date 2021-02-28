@@ -1,0 +1,23 @@
+#!/bin/bash -e
+# wod-help: Print help for wod commands.
+#
+# Usage:
+#
+#   wod help <command>
+
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ $# -ne 1 ]; then
+	print_help $0
+	exit
+fi
+
+command_path="${SCRIPT_HOME}/wod-${1}"
+
+if [ -f ${command_path} ]; then
+    print_help "${SCRIPT_HOME}/wod-${1}"
+else
+    echo "Command '$1' not found."
+fi

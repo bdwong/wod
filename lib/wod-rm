@@ -16,11 +16,17 @@ fi
 
 target="$1"
 ensure_target $1
-
 echo "Removing $target"
+sudo -v
 
-${SCRIPT_HOME}/wod-down $target
-sudo rm -rf `target_dir $target`
+target_dir=`target_dir $target`
+if [ -f "$target_dir"/docker-compose.yml ]; then
+    ${SCRIPT_HOME}/wod-down $target
+fi
+
+if [ -d $target_dir ]; then
+    sudo rm -rf "$target_dir"
+fi
 
 # Delete db volume
 volume_name=`docker volume ls -qf "name=${target}_db_data"`

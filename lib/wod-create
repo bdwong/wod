@@ -37,7 +37,7 @@ fi
 
 # Override configuration with command line arguments.
 TARGET_NAME="$1"
-TARGET_DIR=`target_dir '$TARGET_NAME'`
+TARGET_DIR=`target_dir "$TARGET_NAME"`
 BACKUP_PREFIX=${2:-$BACKUP_PREFIX}
 
 # Compute wordpress tag name

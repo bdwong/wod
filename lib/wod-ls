@@ -34,20 +34,30 @@ docker_is_running && docker=0 || docker=$?
 # $1 = instance name
 # $2 = db or wordpress
 function print_container_status () {
+    local status=1
     if [ $docker -ne 0 ]; then
         echo -n 'E '
     elif container_is_running "$1" "$2"; then
         echo -n '* '
+        status=0
     else
         echo -n '. '
     fi
+    return $status
 }
 
 echo "d w |"
 echo "b p | name"
 echo "====#========================="
 for instance in ${instances}; do
-    print_container_status "${instance}" db
-    print_container_status "${instance}" wordpress
-    echo "| $instance"
+    running=0
+    print_container_status "${instance}" db || running=1
+    print_container_status "${instance}" wordpress || running=1
+    if [ $running -eq 0 ]; then
+        pushd `target_dir $instance` >/dev/null
+        echo "| $instance at $(wp option get siteurl)"
+        popd >/dev/null
+    else
+        echo "| $instance"
+    fi
 done

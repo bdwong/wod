@@ -19,5 +19,10 @@ ensure_target $1
 
 pushd `target_dir $target` >/dev/null
 docker-compose up -d && result=0 || result=$?
+
+if [ $result ]; then
+	SITEURL=`wp option get siteurl`
+	echo "Website ready at ${SITEURL}"
+fi
 popd >/dev/null
 exit $result

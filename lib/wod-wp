@@ -1,4 +1,16 @@
 #!/bin/bash -e
+# wod-wp: Execute wp-cli command.
+#
+# Usage:
+#
+#   wod wp <name> <command> <options>
+#
+# name: name of the wod instance
+#       If your working directory is inside the wod instance, then <name>
+#       should not be specified.
+#
+# command: wp-cli command to run. For a list of commands, try 'wod wp <name> help'.
+#
 
 export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
 . $SCRIPT_HOME/functions
@@ -18,7 +30,8 @@ if [ `basename "$0"` == "wp" ]; then
         fi
     fi
 else
-    instance=`shift`
+    instance=$1
+    shift
 fi
 
 container_name="${instance}_wordpress"

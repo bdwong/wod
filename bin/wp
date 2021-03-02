@@ -1,6 +1,27 @@
 #!/bin/bash -e
 
-container_name="$(basename $PWD)_wordpress"
+export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+. $SCRIPT_HOME/functions
+wod_init
+
+if [ `basename "$0"` == "wp" ]; then
+    # Is current directory a descendent of WOD_HOME?
+    if [[ $PWD == "${WOD_HOME}/"* ]]; then
+        # Get the first path element after WOD_HOME
+        instance=$(realpath --relative-to "${WOD_HOME}" `pwd` | cut -d'/' -f1)
+    else # Call the system wp
+        if [ $0 != `which wp` ]; then
+            `which wp` "$@"
+        else
+            echo "wod wp does not function outside of wod environment."
+            exit 1
+        fi
+    fi
+else
+    instance=`shift`
+fi
+
+container_name="${instance}_wordpress"
 container=`docker container ls -q -f name="$container_name"`
 if [ -z "$container" ]; then
     # Older versions of docker strip hyphens (between 2019-02 and 2021-02)

@@ -1,7 +1,7 @@
 # Environment variables
 
 SCRIPTS=wod
-LIB_SCRIPTS=functions wod-create wod-down wod-help wod-ls wod-restore wod-rm wod-up wod-wp
+LIB_SCRIPTS=functions wod-create wod-down wod-help wod-ls wod-restore wod-rm wod-up wod-wp wp
 TEMPLATES=default no-mcrypt
 
 BINDIR=/usr/bin
@@ -26,7 +26,7 @@ $(BINDIR_SCRIPTS) : $(SRCDIR_SCRIPTS)
 	install $(SRCDIR_SCRIPTS) $(BINDIR)
 
 lib: $(SRCDIR_LIBS)
-	for each in $(LIB_SCRIPTS); do (cd lib && find $$each -type f -exec install -D "{}" "$(LIB_SCRIPTS_DIR)/{}" \;); done
+	mkdir -p $(LIB_SCRIPTS_DIR) && install $(SRCDIR_LIBS) $(LIB_SCRIPTS_DIR)
 
 templates : $(SRCDIR_TEMPLATES)
 	for each in $(TEMPLATES); do (cd $(SRC_TEMPLATE_DIR) && find $$each -type f -exec install -Dm 644 "{}" "$(LIB_TEMPLATE_DIR)/{}" \;); done

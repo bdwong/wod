@@ -22,10 +22,12 @@ if [ `basename "$0"` == "wp" ]; then
         # Get the first path element after WOD_HOME
         instance=$(realpath --relative-to "${WOD_HOME}" `pwd` | cut -d'/' -f1)
     else # Call the system wp
-        if [ $0 != `which wp` ]; then
+        wp_path=`which wp || true`
+        if [ "$0" != "$wp_path" ] && [ -n "$wp_path" ]; then
             `which wp` "$@"
         else
             echo "wod wp does not function outside of wod environment."
+            print_help
             exit 1
         fi
     fi

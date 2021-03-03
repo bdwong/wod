@@ -25,8 +25,10 @@ bin : $(BINDIR_SCRIPTS)
 $(BINDIR_SCRIPTS) : $(SRCDIR_SCRIPTS)
 	install $(SRCDIR_SCRIPTS) $(BINDIR)
 
-lib: $(SRCDIR_LIBS)
-	mkdir -p $(LIB_SCRIPTS_DIR) && install $(SRCDIR_LIBS) $(LIB_SCRIPTS_DIR)
+lib: $(LIBDIR_SCRIPTS)
+
+$(LIBDIR_SCRIPTS) : $(SRCDIR_LIBS)
+	mkdir -p $(LIB_SCRIPTS_DIR); install $(SRCDIR_LIBS) $(LIB_SCRIPTS_DIR)
 
 templates : $(SRCDIR_TEMPLATES)
 	for each in $(TEMPLATES); do (cd $(SRC_TEMPLATE_DIR) && find $$each -type f -exec install -Dm 644 "{}" "$(LIB_TEMPLATE_DIR)/{}" \;); done

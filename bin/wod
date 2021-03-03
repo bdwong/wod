@@ -22,10 +22,8 @@ function wod_bootstrap () {
 
 eval `wod_bootstrap`
 
-. $SCRIPT_HOME/functions
-wod_init
-
 if [ -z "$1" ]; then
+	. $SCRIPT_HOME/functions
 	print_help $0
 	exit
 fi
@@ -40,6 +38,7 @@ elif [ -e $SCRIPT_HOME/wod-${command} ]; then
 	$SCRIPT_HOME/wod-${command} "$@"
 else
 	echo "Invalid command '${command}'."
+	. $SCRIPT_HOME/functions
 	print_help $0
 	exit 1
 fi

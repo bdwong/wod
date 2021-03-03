@@ -14,9 +14,8 @@
 #   'w' - '*' if WordPress is running, '.' if not.
 #   <name> - name of the containers.
 
-export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+eval `wod bootstrap`
 . $SCRIPT_HOME/functions
-wod_init
 
 if [ $# -ne 0 ]; then
 	print_help $0

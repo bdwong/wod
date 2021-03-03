@@ -6,6 +6,7 @@ function wod_init () {
     export WOD_HOME=${WOD_HOME:-~/wod}
     mkdir -p ${WOD_HOME}
 }
+wod_init
 
 # Print the header of the calling script from line 2
 # and strip leading hashes.

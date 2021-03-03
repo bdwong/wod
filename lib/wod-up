@@ -5,9 +5,8 @@
 #
 #   wod up <name>
 
-export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}
+eval `wod bootstrap`
 . $SCRIPT_HOME/functions
-wod_init
 
 if [ $# -ne 1 ]; then
 	print_help $0

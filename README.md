@@ -27,24 +27,61 @@ sudo make install
 This will install the following scripts into /usr/bin:
 
 - `wod` - WordPress on Docker script
-- `wp` - script to run Docker image of wp-cli
-- `wp-restore` - script to restore a WordPress backup
 
-`wp` and `wp-restore` should be run in the directory created by `wod`.
+It will also install auxiliary scripts and templates into /usr/lib/wod.
 
-# Example usage
+You should also add the following line into your .bashrc file:
+
+```bash
+# coexist with system wp-cli.
+eval `wod bootstrap`
+```
+
+Then start a new shell.
+
+Example usage
+=============
 
 ```sh
+# Show list of commands
+wod help
+
 # Create a new WordPress instance called "staging-b"
-wod staging-b
+# The default admin password the URL of the local site displayed
+wod create staging-b
 
 # Restore backups of mysite into staging-b
-wp-restore ~/backups/mysite
+wod restore staging-b ~/backups/mysite
+
+# Invoke wp-cli command on staging-b
+wod wp staging-b search-replace http://mysite.com http://127.0.0.1:8000
+
+# Show the current websites managed by wod and their status.
+wod ls
+
+# Disable the website.
+wod down staging-b
+
+# Delete staging-b.
+wod rm staging-b
 ```
+
+Under the hood, docker and docker-compose is being used to manage the WordPress instances and their databases.
+
 
 # Setting up a Development Environment
 
-Make a copy of this folder. Open up a bash shell (git-bash is okay) and chdir to the folder.
+Make a copy of this folder. Open up a bash shell (git-bash is okay) and chdir to the folder. If you are developing in Windows, WSL2 is recommended.
+
+## Environment variable overrides
+
+To ease development, you can override the location WOD looks for its commands.
+You will still need to install the main WOD script.
+
+```bash
+# Look for sub-commands in ~/src/wod/lib
+export SCRIPT_HOME=~/src/wod/lib
+```
 
 ## Self-signed certificates
 
@@ -72,6 +109,8 @@ WordPress scheduled jobs do not run in the default Docker setup. Use the alterna
 # Add this line to the wp_config.php file.
 define('ALTERNATE_WP_CRON', true);
 ```
+
+# Older stuff
 
 ## Restore from backup (command line)
 
@@ -145,16 +184,6 @@ sudo rm -rf site
 
 # Delete database volume
 docker volume rm `basename $(pwd)|tr -d '-'`_db_data
-```
-
-# Developing WOD
-
-To ease development, you can override the location WOD looks for its commands.
-You will still need to install the main WOD script.
-
-```bash
-# Look for sub-commands in ~/src/wod/lib
-export SCRIPT_HOME=~/src/wod/lib
 ```
 
 # Notes and References

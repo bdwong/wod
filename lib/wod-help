@@ -5,8 +5,7 @@
 #
 #   wod help <command>
 
-eval `wod bootstrap`
-. $SCRIPT_HOME/functions
+eval `wod bootstrap functions`
 
 if [ $# -ne 1 ]; then
 	print_help $0

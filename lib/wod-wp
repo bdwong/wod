@@ -12,8 +12,7 @@
 # command: wp-cli command to run. For a list of commands, try 'wod wp <name> help'.
 #
 
-eval `wod bootstrap`
-. $SCRIPT_HOME/functions
+eval `wod bootstrap functions`
 
 if [ `basename "$0"` == "wp" ]; then
     # Is current directory a descendent of WOD_HOME?
@@ -32,7 +31,7 @@ if [ `basename "$0"` == "wp" ]; then
     fi
 else
     instance=$1
-    shift
+    shift || true
 fi
 
 container_name="${instance}_wordpress"

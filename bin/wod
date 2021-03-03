@@ -14,10 +14,16 @@
 #
 # Try "wod help [command]" to get help on a command.
 
-# Add 'eval wod_bootstrap' to your .bashrc file.
+# Installation note: Add 'eval `wod bootstrap`' to your .bashrc file.
+
+# Set up minimal environment for wod
+# $1 : if "functions" then source wod internal functions.
 function wod_bootstrap () {
 	echo 'export SCRIPT_HOME=${SCRIPT_HOME:-/usr/lib/wod/bin}; '
-	echo 'function wp () { ${SCRIPT_HOME}/wp "$@"; }'
+	echo 'function wp () { ${SCRIPT_HOME}/wp "$@"; };'
+	if [ "$1" == 'functions' ]; then
+		echo 'source ${SCRIPT_HOME}/functions;'
+	fi
 }
 
 eval `wod_bootstrap`
@@ -32,7 +38,7 @@ command=$1
 shift
 
 if [ "$command" == "bootstrap" ]; then
-	wod_bootstrap
+	wod_bootstrap "$1"
 	exit
 elif [ -e $SCRIPT_HOME/wod-${command} ]; then
 	$SCRIPT_HOME/wod-${command} "$@"

@@ -70,7 +70,7 @@ else
     header=$(zcat "$zipfile"|sed -ne '/^#/ p;/^$/ q')
     echo "$header"
     # Turn comments into underscore variables
-    eval $(echo "$header"|sed -ne '/: / { s/\(.*\): \(.*\)/\L\1="\2"/; s/^# //;s/ /_/g; p}')
+    eval $(echo "$header"|sed -ne '/: / { s/\(.*\): \(.*\)/\L\1="\E\2"/; s/^# //;s/ /_/g; p}')
 
     if [ -n "$table_prefix" ]; then
         echo "table prefix: $table_prefix"

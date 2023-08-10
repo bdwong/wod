@@ -16,6 +16,6 @@ target="$1"
 ensure_target $1
 
 pushd `target_dir $target` >/dev/null
-docker-compose down && result=0 || result=$?
+docker compose down && result=0 || result=$?
 popd >/dev/null
 exit $result

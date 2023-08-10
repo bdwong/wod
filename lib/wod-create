@@ -106,7 +106,7 @@ echo "Ready to run docker-compose up. Press Enter to continue"
 read
 
 pushd ${TARGET_DIR} >/dev/null
-docker-compose up -d
+docker compose up -d
 # The database needs a little time to come up.
 sleep 10
 

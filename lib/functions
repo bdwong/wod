@@ -1,5 +1,5 @@
 # WOD functions. This file should be sourced.
-# 
+#
 
 # Initialize WOD global variables.
 function wod_init () {
@@ -49,7 +49,7 @@ function ensure_docker () {
 # $1 = container name
 # $2 = "wordpress" or "db"
 function container_is_running () {
-    container_id=`docker container ls -qf "name=$1_$2_"`
+    container_id=`docker container ls -qf "name=$1-$2-"`
     [ -n "${container_id}" ] || return $?
 }
 
@@ -57,6 +57,6 @@ function container_is_running () {
 # $1 = container name
 # $2 = "wordpress" or "db"
 function container_exists () {
-    container_id=`docker container ls -aqf "name=$1_$2_"`
+    container_id=`docker container ls -aqf "name=$1-$2-"`
     [ -n "${container_id}" ] || return $?
 }

@@ -101,6 +101,28 @@ https://stackoverflow.com/questions/7580508/getting-chrome-to-accept-self-signed
 
 https://www.ibm.com/support/knowledgecenter/en/SSWHYP_4.0.0/com.ibm.apimgmt.cmc.doc/task_apionprem_gernerate_self_signed_openSSL.html
 
+### Alternate domain names
+
+If the website uses multiple domain names (e.g. for language plugins or redirects):
+
+```bash
+# See https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-openssl-directly-on-the-command-line#answer-183973
+# This works for OpenSSL 1.1.1 or later.
+# NOTE: Do not repeat the subject domain in the subjectAltName section.
+
+openssl req -newkey rsa:2048 \
+ -addext "subjectAltName = DNS:alt.com, DNS:alt2.com" \
+ -nodes -keyout cert.key -x509 -days 365 -out cert.pem
+
+# Optional: Verify certificate
+# See https://linuxhandbook.com/check-certificate-openssl/
+openssl x509 -in cert.pem -text -noout
+```
+
+References:
+
+- https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-openssl-directly-on-the-command-line
+
 ## wp-cron
 
 WordPress scheduled jobs do not run in the default Docker setup. Use the alternate job scheduler to fix this.

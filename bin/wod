@@ -5,12 +5,13 @@
 #
 # Commands are:
 #
-# create - create a new wod instance
-# ls	 - list wod instances
-# rm	 - remove wod instance
+# create	- create a new wod instance
+# ls	- list wod instances
+# rm	- remove wod instance
 # restore - restore from backup onto existing wod instance
-# up - start up an existing wod instance
-# down - shut down an existing wod instance
+# up	- start up an existing wod instance
+# down	- shut down an existing wod instance
+# wp	- run wp-cli against an existing wod instance
 #
 # Try "wod help [command]" to get help on a command.
 

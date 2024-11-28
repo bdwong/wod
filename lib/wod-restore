@@ -84,8 +84,12 @@ else
         fi
     fi
 
+    # Explanation of the sed -e commands:
+    # -e At the line starting with "# -----", append the "/*!40101 SET" directive.
+    # -e ignore line starting with "/*M!"
     zcat $zipfile \
         | sed -e '/^# -----/ a\' -e "/*\!40101 SET sql_mode='ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */;" \
+              -e 's/^\/\*M\!.*//' \
         | wp db import -
 fi
 

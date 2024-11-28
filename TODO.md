@@ -14,3 +14,6 @@
     - db.gz for Updraft plus
     - .sql.gz for Backup WP Database plugin.
 - Allow installing an arbitrary WordPress version from https://wordpress.org/download/releases/
+- Document templates feature
+- BUG: strip punctuation (specifically dot (.)) from instance name, otherwise we won't find the container by name.
+- BUG: `wod wp` commands don't work in newer WordPress images because the credentials aren't stored in `wp-config.php` anymore.

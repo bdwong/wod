@@ -49,6 +49,9 @@ if [ -z "$container" ]; then
     exit 1
 fi
 
+# Extract WORDPRESS_* environment variables to use with wpcli
+# --env-file <(docker exec $container_name /bin/env|grep -e "^WORDPRESS")
+
 # --user 33:33 is a workaround to run cli with the same UID/GID
 # as www-data in the WordPress container. Problems arise because the
 # containers have different UID/GID for www-data.
@@ -66,6 +69,7 @@ else
     inputargs=-i
 fi
 docker run $inputargs --rm \
+    --env-file <(docker exec $container /bin/env|grep -e "^WORDPRESS") \
     --volumes-from $container \
     --network container:$container \
     --user 33:33 \

@@ -1,9 +1,5 @@
 # TODO
 
-- BUG: Creating a new WordPress image fails because of the below mentioned credentials no longer being stored in `wp-config.php`. WORKAROUND: Add the credentials back into the wp-config.php file.
-- FIX THIS ABOVE BUG FIRST.
-- BUG: `wod wp` commands don't work in newer WordPress images because the credentials aren't stored in `wp-config.php` anymore.
-
 - verify the WordPress image tag is valid
 - verify the MySQL image tag is valid
 - Substitute port number in docker-compose.yml
